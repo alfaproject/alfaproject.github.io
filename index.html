@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>João Dias</title>
+    <meta name="viewport" content="width=device-width">
+
+    <link href="normalize.css" rel="stylesheet">
+    <link href="app.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="vcard" class="card">
+        <section class="front">
+            <header>
+                <h1>João Dias</h1>
+            </header>
+        </section>
+        <section class="back">
+            <header>
+                <h1>João Dias</h1>
+            </header>
+
+            <div>
+                <a class="adr" href="https://www.google.com.mt/maps/place/35.9114379,14.4909891">
+                    <div class="street-address">Triq Birkirkara</div>
+                    <span class="postal-code">STJ 1307</span> <span class="locality">San Ġiljan</span>
+                    <div class="country-name">Malta</div>
+                </a>
+
+                <div class="tel"><strong class="type">Mobile</strong> <span>+356 7965 9265</span></div>
+                <div class="im"><strong class="type">Skype</strong> <a href="skype:alfaproject?chat">alfaproject</a></div>
+                <div class="email"><strong class="type">Contact</strong> <a href="&#x6D;&#x61;&#x69;&#108;&#116;o:&#x6D;&#x61;&#x69;&#x6C;&#x40;&#x6A;&#x6F;&#x61;&#x6F;&#x64;&#x69;&#x61;&#x73;&#x2E;&#x65;&#x75;">&#x6D;&#x61;&#x69;&#x6C;&#x40;&#x6A;&#x6F;&#x61;&#x6F;&#x64;&#x69;&#x61;&#x73;&#x2E;&#x65;&#x75;</a></div>
+            </div>
+
+            <h2>About me</h2>
+            <p>I've been developing with a ridiculous number of technologies since the late 90s, but in more recent years my focus has been mostly in web technologies.</p>
+        </section>
+    </div>
+
+    <section class="elsewhere">
+        <h2>Elsewhere</h2>
+        <ul class="s">
+            <li><a href="https://www.linkedin.com/in/alfaproject">LinkedIn</a></li>
+            <li><a href="https://www.facebook.com/joaodias">Facebook</a></li>
+            <li><a href="https://github.com/alfaproject">GitHub</a></li>
+            <li><a href="https://twitter.com/_aLfa_">Twitter</a></li>
+            <li><a href="http://stackoverflow.com/users/367708/alfa">Stack Overflow</a></li>
+        </ul>
+        <h2>Projects</h2>
+        <ul class="l">
+            <li><a href="https://github.com/alfaproject/Supay.Irc"><strong>Supay.Irc</strong> &mdash; A complete C# IRC library.</a></li>
+        </ul>
+    </section>
+
+    <aside id="about">
+        <div class="toggle"><i>i</i></div>
+        <div class="inner">
+            <h2>About this page</h2>
+            <p>Thanks to my mother for making me think about an online card again. This page and it's design is not for sale and it probably wont be in the future either. </p>
+
+            <footer>
+                <p>&copy; 2016, João Dias</p>
+            </footer>
+        </div>
+    </aside>
+
+    <script>
+        var vcard = document.getElementById("vcard");
+        vcard.onclick = function() {
+            this.classList.toggle("flip");
+        }
+
+        var about = document.getElementById("about");
+        var toggle = about.getElementsByClassName("toggle")[0];
+        toggle.onclick = function() {
+            about.classList.toggle("show");
+        }
+    </script>
+</body>
+
+</html>
