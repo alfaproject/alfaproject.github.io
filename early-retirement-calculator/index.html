@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Early Retirement Calculator for Europeans</title>
+    <script src="./chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #364354;
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Container responsive sizing */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header responsive */
+        .header {
+            background: #182736;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: clamp(24px, 5vw, 32px);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: clamp(14px, 2.5vw, 16px);
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        /* Content grid - responsive */
+        .content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        /* Desktop layout */
+        @media (min-width: 900px) {
+            body {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .content {
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+                padding: 40px;
+            }
+        }
+
+        /* Tablet layout */
+        @media (min-width: 600px) and (max-width: 899px) {
+            .content {
+                padding: 30px;
+                gap: 30px;
+            }
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: clamp(12px, 2vw, 14px);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group .label-hint {
+            font-size: 12px;
+            color: #666;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Mobile-friendly inputs */
+        input[type="number"],
+        input[type="range"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px; /* Prevents zoom on iOS */
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+        }
+
+        /* Touch-friendly focus states */
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Better range slider for touch */
+        input[type="range"] {
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: none;
+        }
+
+        input[type="number"][readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .currency-symbol,
+        .percentage-symbol {
+            color: #666;
+            font-weight: 600;
+            min-width: 20px;
+            flex-shrink: 0;
+        }
+
+        .value-display {
+            font-size: clamp(12px, 2vw, 14px);
+            color: #667eea;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Touch-friendly preset buttons */
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: clamp(11px, 2vw, 12px);
+            font-weight: 600;
+            transition: all 0.2s ease;
+            color: #333;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .preset-btn:hover,
+        .preset-btn:active {
+            border-color: #667eea;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: scale(0.98);
+        }
+
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-label {
+            font-size: clamp(11px, 2vw, 13px);
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: clamp(22px, 4vw, 28px);
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .result-subtext {
+            font-size: clamp(11px, 2vw, 13px);
+            color: #666;
+        }
+
+        /* Responsive chart container */
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        @media (min-width: 600px) {
+            .chart-container {
+                height: 300px;
+                padding: 20px;
+            }
+        }
+
+        .chart-container canvas {
+            max-height: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .assumptions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 600px) {
+            .assumptions {
+                padding: 20px;
+            }
+        }
+
+        .assumptions h3 {
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .assumptions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .assumptions li {
+            font-size: clamp(11px, 2vw, 13px);
+            color: #666;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .assumptions li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .milestones {
+            margin-top: 20px;
+        }
+
+        .milestone {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        @media (min-width: 600px) {
+            .milestone {
+                padding: 15px;
+            }
+        }
+
+        .milestone:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .milestone-title {
+            font-size: clamp(13px, 2.5vw, 15px);
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .milestone-time {
+            font-size: clamp(11px, 2vw, 13px);
+            color: #667eea;
+            margin-bottom: 2px;
+        }
+
+        .milestone-amount {
+            font-size: clamp(10px, 1.8vw, 12px);
+            color: #999;
+        }
+
+        /* Mobile-specific improvements */
+        @media (max-width: 599px) {
+            /* Reduce spacing on mobile */
+            .input-section,
+            .results-section {
+                gap: 16px;
+            }
+
+            /* Stack input wrappers on very small screens */
+            @media (max-width: 380px) {
+                .input-wrapper {
+                    flex-wrap: wrap;
+                }
+                
+                input[type="number"] {
+                    width: 100%;
+                }
+            }
+
+            /* Larger touch targets for mobile */
+            input[type="number"],
+            .preset-btn {
+                min-height: 44px;
+            }
+
+            /* Prevent horizontal scroll */
+            .container {
+                border-radius: 12px;
+            }
+        }
+
+        /* Loading state for chart */
+        .chart-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Improve number input spinners on mobile */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            height: 44px;
+            opacity: 1;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Better tap highlights */
+        button, input, a {
+            -webkit-tap-highlight-color: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Prevent text selection on buttons */
+        .preset-btn {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇪🇺 Early Retirement Calculator</h1>
+        </div>
+
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label>
+                        Current Portfolio Value
+                        <span class="label-hint">(Investments)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">€</span>
+                        <input type="number" id="currentNetWorth" value="50000" min="0" step="1000">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>
+                        Yearly Net Income
+                        <span class="label-hint">(After taxes)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">€</span>
+                        <input type="number" id="yearlyNetIncome" value="60000" min="0" step="1000">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>
+                        Yearly Spending
+                        <span class="label-hint">(All yearly expenses)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">€</span>
+                        <input type="number" id="annualSpending" value="40000" min="0" step="1000">
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="input-group">
+                    <label>Expected Annual Investment Return</label>
+                    <div class="input-wrapper">
+                        <input type="range" id="annualReturn" min="0" max="15" step="0.1" value="7">
+                        <span class="value-display" id="annualReturnDisplay">7.0%</span>
+                    </div>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="setReturn(4)">Conservative 4%</button>
+                        <button class="preset-btn" onclick="setReturn(7)">Moderate 7%</button>
+                        <button class="preset-btn" onclick="setReturn(10)">Optimistic 10%</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Expected Inflation Rate</label>
+                    <div class="input-wrapper">
+                        <input type="range" id="annualInflation" min="0" max="6" step="0.1" value="2">
+                        <span class="value-display" id="annualInflationDisplay">2.0%</span>
+                    </div>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="setInflation(1)">Low 1%</button>
+                        <button class="preset-btn" onclick="setInflation(2)">ECB Target 2%</button>
+                        <button class="preset-btn" onclick="setInflation(4)">High 4%</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Withdrawal Rate</label>
+                    <div class="input-wrapper">
+                        <input type="range" id="withdrawalRate" min="2.5" max="8" step="0.1" value="4">
+                        <span class="value-display" id="withdrawalRateDisplay">4.0%</span>
+                    </div>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="setWithdrawal(3)">Cautious 3%</button>
+                        <button class="preset-btn" onclick="setWithdrawal(4)">Common 4%</button>
+                        <button class="preset-btn" onclick="setWithdrawal(5)">Aggressive 5%</button>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="input-group">
+                    <label>Calculated Values</label>
+                    <div style="display: grid; gap: 10px; margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
+                            <span style="font-size: 13px; color: #666;">Annual Savings:</span>
+                            <span style="font-size: 14px; font-weight: 600; color: #333;" id="annualSavingsDisplay">€20.000</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
+                            <span style="font-size: 13px; color: #666;">Savings Rate:</span>
+                            <span style="font-size: 14px; font-weight: 600; color: #667eea;" id="savingsRateDisplay">33%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
+                            <span style="font-size: 13px; color: #666;">Real Return:</span>
+                            <span style="font-size: 14px; font-weight: 600; color: #333;" id="realReturnDisplay">5.0% (after inflation)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="result-box">
+                    <div class="result-label">FI Number (Your Goal)</div>
+                    <div class="result-value" id="fiNumber">€1.000.000</div>
+                    <div class="result-subtext">Portfolio needed for €<span id="futureExpenses">40.000</span>/year</div>
+                </div>
+
+                <div class="result-box">
+                    <div class="result-label">Years to Retirement</div>
+                    <div class="result-value" id="yearsToRetirement">22,7</div>
+                    <div class="result-subtext">With a <span id="prominentSavingsRate">33%</span> savings rate</div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="projectionChart" style="box-sizing: border-box; display: block; height: 258px; width: 498px;" width="996" height="516"></canvas>
+                </div>
+
+                <div class="milestones">
+                    <h3 style="font-size: 16px; margin-bottom: 12px; color: #333;">🎯 Milestones</h3>
+                    <div id="milestonesContainer"><div class="milestone">
+                    <div class="milestone-title">🎯 Milestone 1: €100k</div>
+                    <div class="milestone-time">In 2,1 years</div>
+                    <div class="milestone-amount">Portfolio: €124.084</div>
+                </div><div class="milestone">
+                    <div class="milestone-title">🎯 Milestone 2: €250k</div>
+                    <div class="milestone-time">In 7,3 years</div>
+                    <div class="milestone-amount">Portfolio: €274.404</div>
+                </div><div class="milestone">
+                    <div class="milestone-title">🎯 Milestone 3: €500k</div>
+                    <div class="milestone-time">In 13,8 years</div>
+                    <div class="milestone-amount">Portfolio: €510.568</div>
+                </div><div class="milestone">
+                    <div class="milestone-title">🎯 Milestone 4: €1000k</div>
+                    <div class="milestone-time">In 22,7 years</div>
+                    <div class="milestone-amount">Portfolio: €1.023.616</div>
+                </div></div>
+                </div>
+
+                <div class="assumptions">
+                    <h3>💡 Key Assumptions</h3>
+                    <ul>
+                        <li>All values are in today's euros (inflation-adjusted)</li>
+                        <li>Taxes are already deducted from income</li>
+                        <li>Constant saving and spending patterns</li>
+                        <li>Portfolio follows market returns consistently</li>
+                        <li>No major life changes factored in</li>
+                    </ul>
+                </div>
+
+                <div class="links-section" style="
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                ">
+                    <h3 style="
+                        font-size: 16px;
+                        margin-bottom: 12px;
+                        color: #333;
+                        font-weight: 600;
+                    ">🔗 Resources</h3>
+                    <ul style="
+                        list-style: none;
+                        padding: 0;
+                        margin: 0;
+                    ">
+                        <li style="
+                            font-size: 13px;
+                            color: #666;
+                            margin-bottom: 8px;
+                            padding-left: 20px;
+                            position: relative;
+                        ">
+                            <span style="
+                                position: absolute;
+                                left: 0;
+                                color: #667eea;
+                            ">→</span>
+                            <a href="https://angelocolombo.com/" target="_blank" style="
+                                color: #667eea;
+                                text-decoration: none;
+                                transition: color 0.2s ease;
+                            " onmouseover="this.style.color=&#39;#5a6dd8&#39;; this.style.textDecoration=&#39;underline&#39;" onmouseout="this.style.color=&#39;#667eea&#39;; this.style.textDecoration=&#39;none&#39;">
+                                My favorite investment tools in 2025
+                            </a>
+                        </li>
+                        <li style="
+                            font-size: 13px;
+                            color: #666;
+                            margin-bottom: 8px;
+                            padding-left: 20px;
+                            position: relative;
+                        ">
+                            <span style="
+                                position: absolute;
+                                left: 0;
+                                color: #667eea;
+                            ">→</span>
+                            <a href="https://www.youtube.com/p2pinvestingeurope" target="_blank" style="
+                                color: #667eea;
+                                text-decoration: none;
+                                transition: color 0.2s ease;
+                            " onmouseover="this.style.color=&#39;#5a6dd8&#39;; this.style.textDecoration=&#39;underline&#39;" onmouseout="this.style.color=&#39;#667eea&#39;; this.style.textDecoration=&#39;none&#39;">
+                                YouTube
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="disclaimer-section" style="
+                    margin-top: 20px;
+                    padding: 0;
+                    background: #fff5f5;
+                    border: 1px solid #ffcccc;
+                    border-radius: 12px;
+                    overflow: hidden;
+                ">
+                    <button id="disclaimerToggle" style="
+                        width: 100%;
+                        padding: 15px 20px;
+                        background: #fff5f5;
+                        border: none;
+                        text-align: left;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #d73502;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        transition: background 0.2s ease;
+                    " onmouseover="this.style.background=&#39;#ffe8e8&#39;" onmouseout="this.style.background=&#39;#fff5f5&#39;" onclick="toggleDisclaimer()">
+                        <span>⚠️ Important Disclaimer</span>
+                        <span id="disclaimerArrow" style="
+                            transition: transform 0.3s ease;
+                            display: inline-block;
+                        ">▼</span>
+                    </button>
+                    <div id="disclaimerContent" style="
+                        display: none;
+                        padding: 0 20px 20px 20px;
+                        background: #fff5f5;
+                        color: #666;
+                        font-size: 12px;
+                        line-height: 1.6;
+                    ">
+                        <ul style="
+                            list-style: none;
+                            padding: 0;
+                            margin: 0;
+                        ">
+                            <li style="
+                                margin-bottom: 8px;
+                                padding-left: 20px;
+                                position: relative;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    left: 0;
+                                    color: #d73502;
+                                ">•</span>
+                                Past performance and historical returns don't guarantee future results
+                            </li>
+                            <li style="
+                                margin-bottom: 8px;
+                                padding-left: 20px;
+                                position: relative;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    left: 0;
+                                    color: #d73502;
+                                ">•</span>
+                                The calculator provides estimates only, not financial advice
+                            </li>
+                            <li style="
+                                margin-bottom: 8px;
+                                padding-left: 20px;
+                                position: relative;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    left: 0;
+                                    color: #d73502;
+                                ">•</span>
+                                Actual results may differ significantly based on market conditions, individual circumstances, and economic factors
+                            </li>
+                            <li style="
+                                margin-bottom: 8px;
+                                padding-left: 20px;
+                                position: relative;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    left: 0;
+                                    color: #d73502;
+                                ">•</span>
+                                Users should consult qualified financial advisors before making decisions based on projections
+                            </li>
+                            <li style="
+                                margin-bottom: 8px;
+                                padding-left: 20px;
+                                position: relative;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    left: 0;
+                                    color: #d73502;
+                                ">•</span>
+                                The 4% withdrawal rate is a guideline based on historical data, not a guarantee
+                            </li>
+                            <li style="
+                                margin-bottom: 0;
+                                padding-left: 20px;
+                                position: relative;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    left: 0;
+                                    color: #d73502;
+                                ">•</span>
+                                No warranty on accuracy or completeness
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Disclaimer toggle function
+        function toggleDisclaimer() {
+            const content = document.getElementById('disclaimerContent');
+            const arrow = document.getElementById('disclaimerArrow');
+            
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        let chart = null;
+
+        const inputs = {
+            currentNetWorth: document.getElementById('currentNetWorth'),
+            yearlyNetIncome: document.getElementById('yearlyNetIncome'),
+            annualSpending: document.getElementById('annualSpending'),
+            annualSavings: document.getElementById('annualSavings'),
+            annualReturn: document.getElementById('annualReturn'),
+            annualInflation: document.getElementById('annualInflation'),
+            withdrawalRate: document.getElementById('withdrawalRate')
+        };
+
+        const displays = {
+            fiNumber: document.getElementById('fiNumber'),
+            yearsToRetirement: document.getElementById('yearsToRetirement'),
+            futureExpenses: document.getElementById('futureExpenses'),
+            annualSpending: document.getElementById('annualSpendingDisplay'),
+            annualSavings: document.getElementById('annualSavingsDisplay'),
+            annualReturn: document.getElementById('annualReturnDisplay'),
+            annualInflation: document.getElementById('annualInflationDisplay'),
+            withdrawalRate: document.getElementById('withdrawalRateDisplay'),
+            savingsRate: document.getElementById('savingsRateDisplay'),
+            prominentSavingsRate: document.getElementById('prominentSavingsRate'),
+            realReturnDisplay: document.getElementById('realReturnDisplay')
+        };
+
+        function updateDisplays() {
+            const yearlyNetIncome = parseFloat(inputs.yearlyNetIncome.value);
+            const annualSpending = parseFloat(inputs.annualSpending.value);
+            const annualSavings = yearlyNetIncome - annualSpending;
+            const annualReturn = parseFloat(inputs.annualReturn.value);
+            const annualInflation = parseFloat(inputs.annualInflation.value);
+            const withdrawalRate = parseFloat(inputs.withdrawalRate.value);
+
+            displays.annualSavings.textContent = '€' + Math.max(0, annualSavings).toLocaleString('de-DE', {maximumFractionDigits: 0});
+            displays.annualReturn.textContent = annualReturn.toFixed(1) + '%';
+            displays.annualInflation.textContent = annualInflation.toFixed(1) + '%';
+            displays.withdrawalRate.textContent = withdrawalRate.toFixed(1) + '%';
+
+            const savingsRate = yearlyNetIncome > 0 ? ((annualSavings / yearlyNetIncome) * 100) : 0;
+            const savingsRateValue = Math.max(0, Math.round(savingsRate));
+            displays.savingsRate.textContent = savingsRateValue + '%';
+            displays.prominentSavingsRate.textContent = savingsRateValue + '%';
+            
+            // Calculate real return (nominal return - inflation)
+            const realReturn = annualReturn - annualInflation;
+            displays.realReturnDisplay.textContent = realReturn.toFixed(1) + '% (after inflation)';
+
+            calculate();
+        }
+
+        function calculate() {
+            const currentNetWorth = parseFloat(inputs.currentNetWorth.value);
+            const yearlyNetIncome = parseFloat(inputs.yearlyNetIncome.value);
+            const annualSpending = parseFloat(inputs.annualSpending.value);
+            const annualSavings = Math.max(0, yearlyNetIncome - annualSpending);
+            const nominalReturn = parseFloat(inputs.annualReturn.value) / 100;
+            const annualInflation = parseFloat(inputs.annualInflation.value) / 100;
+            const withdrawalRate = parseFloat(inputs.withdrawalRate.value) / 100;
+
+            // Calculate real return (nominal - inflation)
+            const realReturn = nominalReturn - annualInflation;
+
+            const fiNumber = annualSpending / withdrawalRate;
+            displays.fiNumber.textContent = '€' + fiNumber.toLocaleString('de-DE', {maximumFractionDigits: 0});
+            displays.futureExpenses.textContent = annualSpending.toLocaleString('de-DE', {maximumFractionDigits: 0});
+
+            let portfolio = currentNetWorth;
+            let year = 0;
+            let maxYears = 100;
+            let yearsToRetirement = null;
+            let projectionData = [];
+            let milestones = [];
+
+            projectionData.push({
+                year: 0,
+                portfolio: portfolio
+            });
+
+            while (year < maxYears) {
+                year++;
+
+                // Add annual savings (already in today's money)
+                portfolio += annualSavings;
+                
+                // Apply real investment return (after inflation)
+                portfolio = portfolio * (1 + realReturn);
+
+                projectionData.push({
+                    year: year,
+                    portfolio: Math.round(portfolio)
+                });
+
+                if (yearsToRetirement === null && portfolio >= fiNumber) {
+                    let prevPortfolio = currentNetWorth;
+                    if (year > 1) {
+                        prevPortfolio = projectionData[projectionData.length - 2].portfolio;
+                    }
+                    
+                    const portFraction = (fiNumber - prevPortfolio) / (portfolio - prevPortfolio);
+                    yearsToRetirement = (year - 1) + portFraction;
+                }
+
+                const milestoneValues = [100000, 250000, 500000, fiNumber];
+                milestoneValues.forEach(value => {
+                    if (portfolio >= value && !milestones.find(m => m.value === value)) {
+                        let milestoneYear = year;
+                        if (projectionData.length > 1) {
+                            const prevData = projectionData[projectionData.length - 2];
+                            if (prevData.portfolio < value && portfolio >= value) {
+                                const fraction = (value - prevData.portfolio) / (portfolio - prevData.portfolio);
+                                milestoneYear = (year - 1) + fraction;
+                            }
+                        }
+                        milestones.push({
+                            value: value,
+                            year: milestoneYear,
+                            portfolio: Math.round(portfolio)
+                        });
+                    }
+                });
+
+                if (yearsToRetirement !== null && year > yearsToRetirement + 20) break;
+            }
+
+            if (yearsToRetirement !== null) {
+                displays.yearsToRetirement.textContent = yearsToRetirement.toFixed(1).replace('.', ',');
+            } else {
+                displays.yearsToRetirement.textContent = '∞';
+            }
+
+            updateChart(projectionData, fiNumber);
+            updateMilestones(milestones, yearsToRetirement);
+        }
+
+        function updateChart(data, fiNumber) {
+            const canvas = document.getElementById('projectionChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Canvas context not available');
+                return;
+            }
+
+            // Destroy previous chart if it exists
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+
+            // Determine appropriate tick limits based on screen size
+            const isMobile = window.innerWidth < 600;
+            const maxXTicks = isMobile ? 6 : 10;
+
+            const chartConfig = {
+                type: 'line',
+                data: {
+                    labels: data.map(d => 'Yr ' + d.year),
+                    datasets: [
+                        {
+                            label: 'Portfolio Value',
+                            data: data.map(d => d.portfolio),
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'FI Goal',
+                            data: data.map(() => fiNumber),
+                            borderColor: '#764ba2',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                boxWidth: isMobile ? 30 : 40,
+                                font: {
+                                    size: isMobile ? 11 : 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: isMobile ? 12 : 14
+                            },
+                            bodyFont: {
+                                size: isMobile ? 11 : 13
+                            },
+                            padding: isMobile ? 8 : 10,
+                            cornerRadius: 4
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '€' + (value / 1000).toFixed(0) + 'k';
+                                },
+                                font: {
+                                    size: isMobile ? 10 : 11
+                                }
+                            },
+                            grid: {
+                                display: true,
+                                drawBorder: false,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxTicksLimit: maxXTicks,
+                                font: {
+                                    size: isMobile ? 10 : 11
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            };
+
+            try {
+                chart = new Chart(ctx, chartConfig);
+            } catch (error) {
+                console.error('Error creating chart:', error);
+            }
+        }
+
+        function updateMilestones(milestones, yearsToRetirement) {
+            const container = document.getElementById('milestonesContainer');
+            container.innerHTML = '';
+
+            const currentNetWorth = parseFloat(inputs.currentNetWorth.value);
+
+            if (milestones.length === 0) {
+                container.innerHTML = '<p style="color: #999; font-size: 14px;">Adjust your inputs to see milestones</p>';
+                return;
+            }
+
+            milestones.sort((a, b) => a.value - b.value).forEach((milestone, index) => {
+                const div = document.createElement('div');
+                div.className = 'milestone';
+                const yearsFormatted = milestone.year.toFixed(1).replace('.', ',');
+                const isReached = currentNetWorth >= milestone.value;
+                const checkmark = isReached ? '✅' : '🎯';
+                
+                // For achieved milestones, show current portfolio; for future milestones, show projected portfolio
+                const displayPortfolio = isReached ? currentNetWorth : milestone.portfolio;
+                
+                div.innerHTML = `
+                    <div class="milestone-title">${checkmark} Milestone ${index + 1}: €${(milestone.value / 1000).toFixed(0)}k</div>
+                    <div class="milestone-time">${isReached ? 'Achieved! 🎉' : 'In ' + yearsFormatted + ' years'}</div>
+                    <div class="milestone-amount">Portfolio: €${displayPortfolio.toLocaleString('de-DE', {maximumFractionDigits: 0})}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function setReturn(value) {
+            inputs.annualReturn.value = value;
+            updateDisplays();
+        }
+
+        function setInflation(value) {
+            inputs.annualInflation.value = value;
+            updateDisplays();
+        }
+
+        function setWithdrawal(value) {
+            inputs.withdrawalRate.value = value;
+            updateDisplays();
+        }
+
+        // Event listeners
+        inputs.currentNetWorth.addEventListener('input', updateDisplays);
+        inputs.yearlyNetIncome.addEventListener('input', updateDisplays);
+        inputs.annualSpending.addEventListener('input', updateDisplays);
+        inputs.annualReturn.addEventListener('input', updateDisplays);
+        inputs.annualInflation.addEventListener('input', updateDisplays);
+        inputs.withdrawalRate.addEventListener('input', updateDisplays);
+
+        // Handle window resize for chart updates
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (chart) {
+                    calculate(); // Recalculate and redraw chart with new dimensions
+                }
+            }, 250);
+        });
+
+        // Initialize
+        updateDisplays();
+    </script>
+
+
+</body></html>
